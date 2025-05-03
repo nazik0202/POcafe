@@ -1,6 +1,8 @@
 import jdk.jfr.Event;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -19,7 +21,6 @@ public class Gui {
 
     private ScalableBackground panel; //змінені атрібути
     private GridBagConstraints gdc;
-
 
 
     public Gui() {
@@ -56,11 +57,10 @@ public class Gui {
 //        panel.setBackground(Color.DARK_GRAY);
 
 
-
         JButton startButton = new JButton("Старт");
         JButton exitButton = new JButton("Вихід");
 
-        startButton.setPreferredSize(new Dimension(100,50));
+        startButton.setPreferredSize(new Dimension(100, 50));
         startButton.setFont(new Font("Arial", Font.BOLD, 20));
         startButton.setBorder(BorderFactory.createEmptyBorder());
 
@@ -84,32 +84,110 @@ public class Gui {
         gdc.ipadx = 0;
         gdc.ipady = 0;
 
-        panel.add(startButton,gdc);
+        panel.add(startButton, gdc);
         gdc.gridx = 1;
         gdc.weightx = 0;
         gdc.weighty = 0;
         gdc.anchor = GridBagConstraints.NORTHEAST;
         gdc.insets = new Insets(10, 10, 10, 10);
-        exitButton.addActionListener(e ->System.exit(0));
-        panel.add(exitButton,gdc);
+        exitButton.addActionListener(e -> exit());
+        panel.add(exitButton, gdc);
 
 //        frame.add(panel);
         frame.setVisible(true);
     }
+    public void exit() {
+        final JDialog dialog = new JDialog(frame, "Access Code", true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setSize(350, 180);
+        dialog.setLayout(new BorderLayout());
+        dialog.setLocationRelativeTo(frame);
 
-    public void styleb(JButton button){
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel label = new JLabel("Введіть код допуску:");
+        //JTextField codeField = new JTextField();
+        JPasswordField codeField = new JPasswordField();
+        JButton confirmButton = new JButton("Підтвердити");
+        confirmButton.setEnabled(false);
+
+        codeField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                //confirmButton.setEnabled(!codeField.getText().trim().isEmpty());
+                confirmButton.setEnabled(!(new String(codeField.getPassword()).trim()).isEmpty());
+            }
+            public void removeUpdate(DocumentEvent e) {
+                //confirmButton.setEnabled(!codeField.getText().trim().isEmpty());
+                confirmButton.setEnabled(!(new String(codeField.getPassword()).trim()).isEmpty());
+            }
+            public void changedUpdate(DocumentEvent e) {}
+        });
+
+        confirmButton.addActionListener(e -> {
+            //String enteredCode = codeField.getText().trim();
+            String enteredCode = new String(codeField.getPassword()).trim();
+            if ("1212".equals(enteredCode)) { // дефолтний код
+                JOptionPane.showMessageDialog(dialog, "Доступ підтверджено");
+                dialog.dispose();
+                System.exit(0);
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Код неправильний", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        centerPanel.add(label);
+        centerPanel.add(Box.createVerticalStrut(5));
+        centerPanel.add(codeField);
+        centerPanel.add(Box.createVerticalStrut(10));
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> dialog.dispose());
+        bottomPanel.add(backButton);
+
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.add(backButton);
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.add(confirmButton);
+
+        dialog.add(centerPanel, BorderLayout.CENTER);
+        dialog.add(bottomPanel, BorderLayout.SOUTH);
+        bottomPanel.add(leftPanel, BorderLayout.WEST);
+        bottomPanel.add(rightPanel, BorderLayout.EAST);
+
+        dialog.setVisible(true);
+    }
+
+//    public void  exit (){
+//        JLabel passtext = new JLabel("Ведіть код адміністратора");
+//        JTextArea passnum = new JTextArea();
+//        JButton passbut = new JButton("Підтвердити");
+//        JPanel passpanel = new JPanel();
+//        passpanel.add(passtext);
+//        passpanel.add(passnum);
+//        passpanel.add(passtext);
+//        JOptionPane.showMessageDialog(frame, passpanel );
+//
+//    }
+
+    public void styleb(JButton button) {
         button.setBackground(new Color(0, 0, 0));
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 17));
 //        button.setPreferredSize(new Dimension(150,100));
 //        button.setBorder(BorderFactory.createEmptyBorder(25,25,25,25));
     }
-    public void stylel(JLabel label){
+
+    public void stylel(JLabel label) {
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", Font.BOLD, 20));
     }
-    public void start(){
 
+    public void start() {
 
 
         panel.removeAll();
@@ -132,7 +210,7 @@ public class Gui {
         JLabel menuLabel = new JLabel("Виберіть категорію:", SwingConstants.CENTER);
         stylel(menuLabel);
 //        menuLabel.setLocation(menuLabel.getX(),0);
-        panel.add(menuLabel,gdc);
+        panel.add(menuLabel, gdc);
 
         gdc.gridx = 1;
         gdc.gridy = 1;
@@ -148,10 +226,10 @@ public class Gui {
             JButton categoryButton = new JButton(category);
             categoryButton.addActionListener(e -> showItems(category));
             styleb(categoryButton);
-            panel.add(categoryButton,gdc);
-            gdc.gridy +=1;
+            panel.add(categoryButton, gdc);
+            gdc.gridy += 1;
 
-            if(categoriesCount-gdc.gridy<categoriesCount/2 && firstColumn){
+            if (categoriesCount - gdc.gridy < categoriesCount / 2 && firstColumn) {
                 gdc.gridx = 3;
                 gdc.gridy = 1;
                 firstColumn = false;
@@ -167,72 +245,71 @@ public class Gui {
 
         JButton showOrderbutt = new JButton("Показати або оплатити замовлення");
         styleb(showOrderbutt);
-        showOrderbutt.addActionListener(e->showOrder());
-        panel.add(showOrderbutt,gdc);
+        showOrderbutt.addActionListener(e -> showOrder());
+        panel.add(showOrderbutt, gdc);
         panel.revalidate();
         panel.repaint();
         frame.setVisible(true);
     }
 
 
-
     private void showOrder() {
         panel.removeAll();
         gdc.gridy = 0;
-        for (Item item: order.getItems()){
+        for (Item item : order.getItems()) {
             JLabel label = new JLabel(item.getName() + " " + item.getPrice());
-            label.setBorder(BorderFactory.createEmptyBorder(5,100,5,0));
+            label.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
             stylel(label);
             JButton del = new JButton("Видалити");
             styleb(del);
 
-            del.addActionListener(e->{
+            del.addActionListener(e -> {
                 order.delete(item);
                 showOrder();
             });
             gdc.gridx = 0;
-            panel.add(label,gdc);
+            panel.add(label, gdc);
             gdc.gridx = 2;
-            panel.add(del,gdc);
+            panel.add(del, gdc);
             gdc.gridy += 1;
         }
         JLabel totalptice = new JLabel("Сумарна вартість: " + order.getTotalPrice());
-        totalptice.setBorder(BorderFactory.createEmptyBorder(5,100,5,0));
+        totalptice.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
         stylel(totalptice);
         gdc.gridx = 1;
         gdc.gridy += 1;
-        panel.add(totalptice,gdc);
+        panel.add(totalptice, gdc);
         JButton backl = new JButton("Повернутись");
         styleb(backl);
-        backl.addActionListener(e->start());
+        backl.addActionListener(e -> start());
         JButton pay = new JButton("Оплатити замовлення");
         styleb(pay);
-        pay.addActionListener(e->paying());
+        pay.addActionListener(e -> paying());
         gdc.gridx = 2;
         gdc.gridy += 1;
-        panel.add(pay,gdc);
+        panel.add(pay, gdc);
         gdc.gridx = 0;
-        panel.add(backl,gdc);
+        panel.add(backl, gdc);
         panel.revalidate();
         panel.repaint();
     }
 
-    private void paying(){
+    private void paying() {
         int orderNumber = new Random().nextInt(9000) + 1000;
 
         panel.removeAll();
 
         JLabel confirmationLabel = new JLabel("Ваше замовлення підтверджене!");
-        confirmationLabel.setBorder(BorderFactory.createEmptyBorder(5,100,5,0));
+        confirmationLabel.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
         stylel(confirmationLabel);
         gdc.gridy = 0;
-        panel.add(confirmationLabel,gdc);
+        panel.add(confirmationLabel, gdc);
 
         JLabel orderNumberLabel = new JLabel("Номер вашого замовлення: " + orderNumber);
-        orderNumberLabel.setBorder(BorderFactory.createEmptyBorder(5,100,5,0));
+        orderNumberLabel.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
         stylel(orderNumberLabel);
         gdc.gridy += 1;
-        panel.add(orderNumberLabel,gdc);
+        panel.add(orderNumberLabel, gdc);
 
         JButton exiButton = new JButton("Вийти");
         styleb(exiButton);
@@ -241,12 +318,12 @@ public class Gui {
             this.frame.dispose();
         });
         gdc.gridy += 1;
-        panel.add(exiButton,gdc);
+        panel.add(exiButton, gdc);
         panel.revalidate();
         panel.repaint();
     }
 
-    public void showItems(String categoryName){
+    public void showItems(String categoryName) {
         panel.removeAll();
 //        gdc.gridx = 0; //місце по горизонталі
 //        gdc.gridy = 0; //місце по вертикалі
@@ -260,23 +337,37 @@ public class Gui {
         gdc.ipady = 60; //розмір по вертикалі
 
         List<Item> listItem = menu.getMenuCategories().get(categoryName);
-        for(Item item: listItem){
+        for (Item item : listItem) {
             JButton button = new JButton(item.getName());
             styleb(button);
-            button.addActionListener(e->addToOrder(item));
-            panel.add(button,gdc);
+            button.addActionListener(e -> addToOrder(item));
+            panel.add(button, gdc);
         }
         gdc.ipadx = 410;
         gdc.ipady = 75;
         JButton back = new JButton("Повернутися");
         styleb(back);
-        back.addActionListener(e->start());
-        panel.add(back,gdc);
+        back.addActionListener(e -> start());
+        panel.add(back, gdc);
         panel.revalidate();
         panel.repaint();
     }
+
     private void addToOrder(Item item){
         this.order.addOrder(item);
-        JOptionPane.showMessageDialog(frame, item.getName() + " Додано до замовлення.");
+        showAutoClosingMessage(item.getName() + " додано до замовлення.", 1500);
+    }
+
+    private void showAutoClosingMessage(String message, int timeoutMillis) {
+        final JDialog dialog = new JDialog(frame, "Info", false);
+        JLabel label = new JLabel(message, SwingConstants.CENTER);
+        dialog.getContentPane().add(label);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setSize(300, 100);
+        dialog.setLocationRelativeTo(frame);
+
+        new Timer(timeoutMillis, e -> dialog.dispose()).start();
+
+        dialog.setVisible(true);
     }
 }
