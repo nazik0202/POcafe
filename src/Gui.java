@@ -254,6 +254,7 @@ public class Gui {
 
 
     private void showOrder() {
+        gdc.gridwidth = 1;
         panel.removeAll();
         gdc.gridy = 0;
         for (Item item : order.getItems()) {
@@ -267,7 +268,7 @@ public class Gui {
                 order.delete(item);
                 showOrder();
             });
-            gdc.gridx = 0;
+            gdc.gridx = 1;
             panel.add(label, gdc);
             gdc.gridx = 2;
             panel.add(del, gdc);
@@ -275,7 +276,8 @@ public class Gui {
         }
         JLabel totalptice = new JLabel("Сумарна вартість: " + order.getTotalPrice());
         totalptice.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
-        stylel(totalptice);
+        totalptice.setForeground(Color.WHITE);
+        totalptice.setFont(new Font("Arial", Font.BOLD, 40));
         gdc.gridx = 1;
         gdc.gridy += 1;
         panel.add(totalptice, gdc);
@@ -359,15 +361,25 @@ public class Gui {
     }
 
     private void showAutoClosingMessage(String message, int timeoutMillis) {
-        final JDialog dialog = new JDialog(frame, "Info", false);
+        JDialog dialog = new JDialog(frame, "Info", false);
         JLabel label = new JLabel(message, SwingConstants.CENTER);
         dialog.getContentPane().add(label);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setSize(300, 100);
-        dialog.setLocationRelativeTo(frame);
+        //dialog.setLocationRelativeTo(frame);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = screenSize.width - dialog.getWidth() - 50;
+        int y = screenSize.height - dialog.getHeight() - 50;
+        dialog.setLocation(x, y);
 
         new Timer(timeoutMillis, e -> dialog.dispose()).start();
+
 
         dialog.setVisible(true);
     }
 }
+//Toolkit.getDefaultToolkit().getScreenSize();
+//int x = screenSize.width - dialog.getWidth() - 50;
+//int y = screenSize.height - dialog.getHeight() - 50;
+//        dialog.setLocation(x, y);
