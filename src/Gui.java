@@ -242,11 +242,21 @@ public class Gui {
         gdc.ipadx = 220;
         gdc.ipady = 70;
         gdc.anchor = GridBagConstraints.SOUTH;
-
-        JButton showOrderbutt = new JButton("Показати або оплатити замовлення");
-        styleb(showOrderbutt);
-        showOrderbutt.addActionListener(e -> showOrder());
-        panel.add(showOrderbutt, gdc);
+        if(order.getItems().isEmpty()){
+            JButton exitStartScreen = new JButton("Вийти на початковий екран");
+            styleb(exitStartScreen);
+            exitStartScreen.addActionListener(e -> {
+                new Gui();
+                this.frame.dispose();
+            });
+            panel.add(exitStartScreen, gdc);
+        }
+        else {
+            JButton showOrderbutt = new JButton("Показати або оплатити замовлення");
+            styleb(showOrderbutt);
+            showOrderbutt.addActionListener(e -> showOrder());
+            panel.add(showOrderbutt, gdc);
+        }
         panel.revalidate();
         panel.repaint();
         frame.setVisible(true);
