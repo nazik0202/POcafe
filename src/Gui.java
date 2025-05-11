@@ -22,6 +22,8 @@ public class Gui {
     private ScalableBackground panel; //змінені атрібути
     private GridBagConstraints gdc;
 
+    private boolean secretFich = false;
+
 
     public Gui() {
         this.menu = new Menu();
@@ -72,6 +74,7 @@ public class Gui {
         exitButton.setForeground(Color.WHITE);
 
         startButton.addActionListener(e -> start());
+
         this.gdc = new GridBagConstraints();
         gdc.gridx = 0;
         gdc.gridy = 0;
@@ -85,6 +88,7 @@ public class Gui {
         gdc.ipady = 0;
 
         panel.add(startButton, gdc);
+
         gdc.gridx = 1;
         gdc.weightx = 0;
         gdc.weighty = 0;
@@ -95,7 +99,27 @@ public class Gui {
 
 //        frame.add(panel);
         frame.setVisible(true);
+
+        secretButton(gdc);
+
+//        gdc.anchor = GridBagConstraints.NORTH;
+//        gdc.gridx = 0;
+//        gdc.gridy = 0;
+//        if(secretFich) {
+//            JButton fichbutton = new JButton("Виключити секретну фічу");
+//            fichbutton.addActionListener(e -> secretFich());
+//            panel.add(fichbutton,gdc);
+//        }
+//        else{
+//            JButton fichbutton = new JButton("Включити секретну фічу");
+//            fichbutton.addActionListener(e -> secretFich());
+//            panel.add(fichbutton,gdc);
+//        }
+
+
     }
+
+
     public void exit() {
         final JDialog dialog = new JDialog(frame, "Access Code", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -132,7 +156,8 @@ public class Gui {
                 JOptionPane.showMessageDialog(dialog, "Доступ підтверджено");
                 dialog.dispose();
                 System.exit(0);
-            } else {
+            }
+            else {
                 JOptionPane.showMessageDialog(dialog, "Код неправильний", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -156,6 +181,7 @@ public class Gui {
 
         dialog.add(centerPanel, BorderLayout.CENTER);
         dialog.add(bottomPanel, BorderLayout.SOUTH);
+
         bottomPanel.add(leftPanel, BorderLayout.WEST);
         bottomPanel.add(rightPanel, BorderLayout.EAST);
 
@@ -185,6 +211,13 @@ public class Gui {
     public void stylel(JLabel label) {
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", Font.BOLD, 20));
+        label.setBackground(Color.DARK_GRAY);
+        if(secretFich) {
+            label.setOpaque(true);
+        }
+        else{
+            label.setOpaque(false);
+        }
     }
 
     public void start() {
@@ -227,14 +260,17 @@ public class Gui {
             categoryButton.addActionListener(e -> showItems(category));
             styleb(categoryButton);
             panel.add(categoryButton, gdc);
+
             gdc.gridy += 1;
 
             if (categoriesCount - gdc.gridy < categoriesCount / 2 && firstColumn) {
                 gdc.gridx = 3;
                 gdc.gridy = 1;
+
                 firstColumn = false;
             }
         }
+
 
         gdc.gridwidth = 0;
         gdc.gridx = 2;
@@ -242,6 +278,8 @@ public class Gui {
         gdc.ipadx = 220;
         gdc.ipady = 70;
         gdc.anchor = GridBagConstraints.SOUTH;
+
+
         if(order.getItems().isEmpty()){
             JButton exitStartScreen = new JButton("Вийти на початковий екран");
             styleb(exitStartScreen);
@@ -257,20 +295,26 @@ public class Gui {
             showOrderbutt.addActionListener(e -> showOrder());
             panel.add(showOrderbutt, gdc);
         }
+
+
         panel.revalidate();
         panel.repaint();
         frame.setVisible(true);
     }
 
 
+
+
     private void showOrder() {
         gdc.gridwidth = 1;
         panel.removeAll();
         gdc.gridy = 0;
+
         for (Item item : order.getItems()) {
             JLabel label = new JLabel(item.getName() + " " + item.getPrice());
             label.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
             stylel(label);
+
             JButton del = new JButton("Видалити");
             styleb(del);
 
@@ -280,31 +324,58 @@ public class Gui {
             });
             gdc.gridx = 1;
             panel.add(label, gdc);
+
             gdc.gridx = 2;
             panel.add(del, gdc);
+
             gdc.gridy += 1;
         }
+
+
+        gdc.gridx = 1;
+        gdc.gridy += 1;
+
         JLabel totalptice = new JLabel("Сумарна вартість: " + order.getTotalPrice());
         totalptice.setBorder(BorderFactory.createEmptyBorder(5, 100, 5, 0));
         totalptice.setForeground(Color.WHITE);
         totalptice.setFont(new Font("Arial", Font.BOLD, 40));
-        gdc.gridx = 1;
-        gdc.gridy += 1;
         panel.add(totalptice, gdc);
+
         JButton backl = new JButton("Повернутись");
         styleb(backl);
         backl.addActionListener(e -> start());
-        JButton pay = new JButton("Оплатити замовлення");
-        styleb(pay);
-        pay.addActionListener(e -> paying());
+
         gdc.gridx = 2;
         gdc.gridy += 1;
-        panel.add(pay, gdc);
+
+        if(order.getItems().isEmpty()){
+            JButton exitStartScren = new JButton("Вийти на початковий екран");
+            styleb(exitStartScren);
+            exitStartScren.addActionListener(e -> {
+                new Gui();
+                this.frame.dispose();
+            });
+            panel.add(exitStartScren, gdc);
+        }
+        else
+        {
+            JButton pay = new JButton("Оплатити замовлення");
+            styleb(pay);
+            pay.addActionListener(e -> paying());
+            panel.add(pay, gdc);
+        }
+
+
+        gdc.gridx = 2;
+        gdc.gridy += 1;
         gdc.gridx = 0;
         panel.add(backl, gdc);
         panel.revalidate();
         panel.repaint();
     }
+
+
+
 
     private void paying() {
         int orderNumber = new Random().nextInt(9000) + 1000;
@@ -329,14 +400,18 @@ public class Gui {
             new Gui();
             this.frame.dispose();
         });
+
         gdc.gridy += 1;
         panel.add(exiButton, gdc);
         panel.revalidate();
         panel.repaint();
     }
 
+
+
     public void showItems(String categoryName) {
         panel.removeAll();
+
 //        gdc.gridx = 0; //місце по горизонталі
 //        gdc.gridy = 0; //місце по вертикалі
 //        gdc.gridwidth = 1; //скільки займає місця по горизонталі
@@ -349,12 +424,14 @@ public class Gui {
         gdc.ipady = 60; //розмір по вертикалі
 
         List<Item> listItem = menu.getMenuCategories().get(categoryName);
+
         for (Item item : listItem) {
             JButton button = new JButton(item.getName());
             styleb(button);
             button.addActionListener(e -> addToOrder(item));
             panel.add(button, gdc);
         }
+
         gdc.ipadx = 410;
         gdc.ipady = 75;
         JButton back = new JButton("Повернутися");
@@ -365,10 +442,14 @@ public class Gui {
         panel.repaint();
     }
 
+
+
     private void addToOrder(Item item){
         this.order.addOrder(item);
         showAutoClosingMessage(item.getName() + " додано до замовлення.", 1500);
     }
+
+
 
     private void showAutoClosingMessage(String message, int timeoutMillis) {
         JDialog dialog = new JDialog(frame, "Info", false);
@@ -388,7 +469,36 @@ public class Gui {
 
         dialog.setVisible(true);
     }
+    private void secretButton(GridBagConstraints gdc){
+        gdc.anchor = GridBagConstraints.NORTH;
+        gdc.gridx = 0;
+        gdc.gridy = 0;
+        if(secretFich) {
+            JButton fichbutton = new JButton("Виключити секретну фічу");
+            fichbutton.addActionListener(e -> secretFich());
+            panel.add(fichbutton,gdc);
+        }
+        else{
+            JButton fichbutton = new JButton("Включити секретну фічу");
+            fichbutton.addActionListener(e -> secretFich());
+            panel.add(fichbutton,gdc);
+        }
+
+    }
+    private void secretFich(){
+        if(secretFich){
+            secretFich = false;
+            new Gui();
+            this.frame.dispose();
+        }
+        else{
+            secretFich = true;
+            new Gui();
+            this.frame.dispose();
+        }
+    }
 }
+
 //Toolkit.getDefaultToolkit().getScreenSize();
 //int x = screenSize.width - dialog.getWidth() - 50;
 //int y = screenSize.height - dialog.getHeight() - 50;
