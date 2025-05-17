@@ -22,13 +22,35 @@ public class Gui {
     private ScalableBackground panel; //змінені атрібути
     private GridBagConstraints gdc;
 
-    private boolean secretFich = false;
+    static boolean secretFich = false;
+    private JButton secretFeatureButton;
 
 
     public Gui() {
         this.menu = new Menu();
         this.order = new Order();
         this.frame = new JFrame();
+
+        preStart();
+
+//        gdc.anchor = GridBagConstraints.NORTH;
+//        gdc.gridx = 0;
+//        gdc.gridy = 0;
+//        if(secretFich) {
+//            JButton fichbutton = new JButton("Виключити секретну фічу");
+//            fichbutton.addActionListener(e -> secretFich());
+//            panel.add(fichbutton,gdc);
+//        }
+//        else{
+//            JButton fichbutton = new JButton("Включити секретну фічу");
+//            fichbutton.addActionListener(e -> secretFich());
+//            panel.add(fichbutton,gdc);
+//        }
+
+
+    }
+
+    public void preStart(){
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -98,13 +120,14 @@ public class Gui {
         panel.add(exitButton, gdc);
 
 //        frame.add(panel);
-        frame.setVisible(true);
+//        frame.setVisible(true);
 
-        secretButton(gdc);
-
-//        gdc.anchor = GridBagConstraints.NORTH;
-//        gdc.gridx = 0;
-//        gdc.gridy = 0;
+        secretFeatureButton = new JButton(secretFich ? "Виключити секретну фічу" : "Включити секретну фічу");
+        secretFeatureButton.addActionListener(e -> secretFich());
+        gdc.anchor = GridBagConstraints.NORTH;
+        gdc.gridx = 0;
+        gdc.gridy = 0;
+        panel.add(secretFeatureButton,gdc);
 //        if(secretFich) {
 //            JButton fichbutton = new JButton("Виключити секретну фічу");
 //            fichbutton.addActionListener(e -> secretFich());
@@ -116,8 +139,11 @@ public class Gui {
 //            panel.add(fichbutton,gdc);
 //        }
 
-
+//        panel.revalidate();
+//        panel.repaint();
+        frame.setVisible(true);
     }
+
 
 
     public void exit() {
@@ -469,33 +495,27 @@ public class Gui {
 
         dialog.setVisible(true);
     }
-    private void secretButton(GridBagConstraints gdc){
-        gdc.anchor = GridBagConstraints.NORTH;
-        gdc.gridx = 0;
-        gdc.gridy = 0;
-        if(secretFich) {
-            JButton fichbutton = new JButton("Виключити секретну фічу");
-            fichbutton.addActionListener(e -> secretFich());
-            panel.add(fichbutton,gdc);
-        }
-        else{
-            JButton fichbutton = new JButton("Включити секретну фічу");
-            fichbutton.addActionListener(e -> secretFich());
-            panel.add(fichbutton,gdc);
-        }
-
-    }
+//    private void secretButton(GridBagConstraints gdc){
+//        gdc.anchor = GridBagConstraints.NORTH;
+//        gdc.gridx = 0;
+//        gdc.gridy = 0;
+//        if(secretFich) {
+//            JButton fichbutton = new JButton("Виключити секретну фічу");
+//            fichbutton.addActionListener(e -> secretFich());
+//            panel.add(fichbutton,gdc);
+//        }
+//        else{
+//            JButton fichbutton = new JButton("Включити секретну фічу");
+//            fichbutton.addActionListener(e -> secretFich());
+//            panel.add(fichbutton,gdc);
+//        }
+//
+//    }
     private void secretFich(){
-        if(secretFich){
-            secretFich = false;
-            new Gui();
-            this.frame.dispose();
-        }
-        else{
-            secretFich = true;
-            new Gui();
-            this.frame.dispose();
-        }
+        secretFich = !secretFich; // Інвертуємо значення boolean
+        secretFeatureButton.setText(secretFich ? "Виключити секретну фічу" : "Включити секретну фічу");
+        panel.revalidate(); // Повідомляємо менеджер компоновки про зміни
+        panel.repaint();
     }
 }
 
