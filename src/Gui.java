@@ -18,11 +18,13 @@ public class Gui {
 
     private ScalableBackground panel; //змінені атрібути
     private GridBagConstraints gdc;
-    private int messageOffset = 0;
 
     static boolean secretFich = false;
     private JButton secretFeatureButton;
 
+    private static final AtomicInteger messageOffset = new AtomicInteger(0);
+    private static final int MAX_OFFSET = 10;
+    private static final int OFFSET_STEP = 30;
 
     public Gui() {
         this.menu = new Menu();
@@ -481,27 +483,27 @@ public class Gui {
         dialog.getContentPane().add(label);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setSize(300, 100);
-        //dialog.setLocationRelativeTo(frame);
-
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        AtomicInteger currentIndex = new AtomicInteger(messageOffset);
-        int x = screenSize.width - dialog.getWidth() - 50;
+
         int baseY = screenSize.height - dialog.getHeight() - 50;
-        int offsetStep = 55;
-        int y = baseY - currentIndex.get() * offsetStep;
+
+        // Limit offset to prevent windows from going off-screen
+        int currentOffset = Math.min(messageOffset.getAndIncrement(), MAX_OFFSET);
+
+        int x = screenSize.width - dialog.getWidth() - 50;
+        int y = Math.max(0, baseY - currentOffset * OFFSET_STEP);
+
         dialog.setLocation(x, y);
-        messageOffset += 1;
 
-//        new Timer(timeoutMillis, e -> dialog.dispose()).start();
-
+        // Create a timer that closes the dialog and safely decrements the offset
         new Timer(timeoutMillis, e -> {
-            dialog.dispose();
-            currentIndex.addAndGet(-1);
-
+            if (dialog.isDisplayable()) {
+                dialog.dispose();
+            }
+            messageOffset.updateAndGet(offset -> Math.max(0, offset - 1));
         }).start();
 
-        messageOffset = currentIndex.get();
         dialog.setVisible(true);
     }
 //    private void secretButton(GridBagConstraints gdc){
