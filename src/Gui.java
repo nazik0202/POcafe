@@ -1,15 +1,12 @@
-import jdk.jfr.Event;
-
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Gui {
@@ -21,6 +18,7 @@ public class Gui {
 
     private ScalableBackground panel; //змінені атрібути
     private GridBagConstraints gdc;
+    private int messageOffset = 0;
 
     static boolean secretFich = false;
     private JButton secretFeatureButton;
@@ -472,7 +470,7 @@ public class Gui {
 
     private void addToOrder(Item item){
         this.order.addOrder(item);
-        showAutoClosingMessage(item.getName() + " додано до замовлення.", 1500);
+        showAutoClosingMessage(item.getName() + " додано до замовлення.", 15000);
     }
 
 
@@ -485,14 +483,25 @@ public class Gui {
         dialog.setSize(300, 100);
         //dialog.setLocationRelativeTo(frame);
 
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        AtomicInteger currentIndex = new AtomicInteger(messageOffset);
         int x = screenSize.width - dialog.getWidth() - 50;
-        int y = screenSize.height - dialog.getHeight() - 50;
+        int baseY = screenSize.height - dialog.getHeight() - 50;
+        int offsetStep = 55;
+        int y = baseY - currentIndex.get() * offsetStep;
         dialog.setLocation(x, y);
+        messageOffset += 1;
 
-        new Timer(timeoutMillis, e -> dialog.dispose()).start();
+//        new Timer(timeoutMillis, e -> dialog.dispose()).start();
 
+        new Timer(timeoutMillis, e -> {
+            dialog.dispose();
+            currentIndex.addAndGet(-1);
 
+        }).start();
+
+        messageOffset = currentIndex.get();
         dialog.setVisible(true);
     }
 //    private void secretButton(GridBagConstraints gdc){
